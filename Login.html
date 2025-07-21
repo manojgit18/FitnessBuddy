@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Auth | Fitness Buddy</title>
+  <link rel="stylesheet" href="dashboard.css" />
+
+</head>
+<body>
+
+  <div class="auth-container">
+
+    <!-- Login Form -->
+    <div class="login-box" id="login-box">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="Email" required />
+      <input type="password" id="login-password" placeholder="Password" required />
+      <button id="login-btn">Login</button>
+      <p id="login-message" style="color: red; margin-top: 10px;"></p>
+      <p>Don't have an account? <a href="#" onclick="toggleForm('signup')">Sign up</a></p>
+    </div>
+
+    <!-- Signup Form -->
+    <div class="signup-box" id="signup-box" style="display:none;">
+      <h2>Sign Up</h2>
+      <input type="text" id="signup-name" placeholder="Full Name" required />
+      <input type="email" id="signup-email" placeholder="Email" required />
+      <input type="password" id="signup-password" placeholder="Password" required />
+      <button id="signup-btn">Sign Up</button>
+      <p id="signup-message" style="color: red; margin-top: 10px;"></p>
+      <p>Already have an account? <a href="#" onclick="toggleForm('login')">Login</a></p>
+    </div>
+
+    <!-- Logout Section -->
+    <div id="logout-section" style="display:none;">
+      <h2>Welcome Back!</h2>
+      <p>You are logged in.  <a href="index.html">Click here</a></p>
+      <button id="logout-btn">Logout</button>
+    </div>
+
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Firebase imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    // Firebase Config (replace with your actual config)
+    const firebaseConfig = {
+    apiKey: "AIzaSyCYSMsYz4QqS7ffJsdp-tEHW5kcXfA9kag",
+    authDomain: "fitnessbuddy-a824e.firebaseapp.com",
+    projectId: "fitnessbuddy-a824e",
+    storageBucket: "fitnessbuddy-a824e.firebasestorage.app",
+    messagingSenderId: "484923287759",
+    appId: "1:484923287759:web:08de79d5a0d9bf3d84afba",
+    measurementId: "G-5720QK7GHW"
+    };
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Toggle between login and signup
+    window.toggleForm = function(type) {
+      document.getElementById("login-box").style.display = type === "login" ? "block" : "none";
+      document.getElementById("signup-box").style.display = type === "signup" ? "block" : "none";
+      document.getElementById("logout-section").style.display = "none";
+    }
+
+    // Login
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("logout-section").style.display = "block";
+        window
+      } catch (error) {
+        document.getElementById("login-message").innerText = error.message;
+      }
+    });
+
+    // Signup
+    document.getElementById("signup-btn").addEventListener("click", async () => {
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        document.getElementById("signup-box").style.display = "none";
+        document.getElementById("logout-section").style.display = "block";
+      } catch (error) {
+        document.getElementById("signup-message").innerText = error.message;
+      }
+    });
+
+    // Logout
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      await signOut(auth);
+      document.getElementById("logout-section").style.display = "none";
+      document.getElementById("login-box").style.display = "block";
+    });
+
+    // Auto-detect login state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("signup-box").style.display = "none";
+        document.getElementById("logout-section").style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
